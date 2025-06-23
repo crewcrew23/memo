@@ -34,10 +34,20 @@ func (c *Cache[T]) Set(key string, value T, ttl time.Duration) {
 
 func (c *Cache[T]) Get(key string) (T, bool) {
 	c.mu.RLock()
-	defer c.mu.RUnlock()
-
 	item, exists := c.items[key]
-	if !exists || time.Now().After(item.TTL) {
+	c.mu.RUnlock()
+
+	if !exists {
+		var zero T
+		return zero, false
+	}
+
+	if time.Now().After(item.TTL) {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+
+		delete(c.items, key)
+
 		var zero T
 		return zero, false
 	}
