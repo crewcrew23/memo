@@ -16,7 +16,7 @@ func clean[T any](c *Cache[T]) {
 
 	for k, v := range c.items {
 		c.mu.RLock()
-		if time.Now().After(v.ttl) {
+		if time.Now().After(v.TTL) {
 			expiredKeys = append(expiredKeys, k)
 		}
 		c.mu.RUnlock()
