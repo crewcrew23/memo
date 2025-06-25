@@ -1,12 +1,22 @@
 package cache
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
-func StartClean[T any](c *Cache[T]) {
+func StartClean[T any](c *Cache[T], ctx context.Context) {
 	go func() {
+	Loop:
 		for {
-			time.Sleep(time.Minute * 5)
-			clean(c)
+			select {
+			case <-ctx.Done():
+				break Loop
+
+			default:
+				time.Sleep(time.Minute * 5)
+				clean(c)
+			}
 		}
 	}()
 }
