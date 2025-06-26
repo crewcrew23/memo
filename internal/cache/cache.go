@@ -15,19 +15,17 @@ type Item[T any] struct {
 }
 
 type Cache[T any] struct {
-	items   map[string]*Item[T]
-	mu      sync.RWMutex
-	ctx     context.Context
-	cancel  context.CancelFunc
-	isClose bool
+	items  map[string]*Item[T]
+	mu     sync.RWMutex
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 func New[T any](ctx context.Context, cancel context.CancelFunc) *Cache[T] {
 	return &Cache[T]{
-		items:   make(map[string]*Item[T]),
-		ctx:     ctx,
-		cancel:  cancel,
-		isClose: false,
+		items:  make(map[string]*Item[T]),
+		ctx:    ctx,
+		cancel: cancel,
 	}
 }
 

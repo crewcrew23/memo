@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func StartClean[T any](c *Cache[T], ctx context.Context) {
+func StartClean[T any](c *Cache[T], ctx context.Context, interval time.Duration) {
 	go func() {
 	Loop:
 		for {
@@ -14,7 +14,7 @@ func StartClean[T any](c *Cache[T], ctx context.Context) {
 				break Loop
 
 			default:
-				time.Sleep(time.Minute * 5)
+				time.Sleep(interval)
 				clean(c)
 			}
 		}
