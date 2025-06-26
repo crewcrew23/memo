@@ -22,12 +22,17 @@ func StartClean[T any](c *Cache[T], ctx context.Context, interval time.Duration)
 }
 
 func clean[T any](c *Cache[T]) {
-	var expiredKeys []string
+	type tmp struct {
+		key   string
+		value *Item[T]
+	}
+
+	var expiredKeys []*tmp
 
 	for k, v := range c.items {
 		c.mu.RLock()
 		if time.Now().After(v.TTL) {
-			expiredKeys = append(expiredKeys, k)
+			expiredKeys = append(expiredKeys, &tmp{key: k, value: v})
 		}
 		c.mu.RUnlock()
 	}
@@ -35,7 +40,10 @@ func clean[T any](c *Cache[T]) {
 	if len(expiredKeys) > 0 {
 		c.mu.Lock()
 		for _, k := range expiredKeys {
-			delete(c.items, k)
+			if c.onEvicted != nil {
+				c.onEvicted(k.key, k.value.Value)
+			}
+			delete(c.items, k.key)
 		}
 		c.mu.Unlock()
 

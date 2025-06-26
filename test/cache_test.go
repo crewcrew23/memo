@@ -29,11 +29,11 @@ func TestSetValueWithContext(t *testing.T) {
 	testData := &TestData{5}
 	c := memo.New[*TestData]()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*2)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	if err := c.SetWithContext(ctx, "key", testData, time.Second*5); err != nil {
 		t.Fail()
 	}
-
+	cancel()
 }
 
 func TestSetValueWithContext_Cancel(t *testing.T) {
@@ -53,7 +53,7 @@ func TestGetValueWithContext(t *testing.T) {
 	testData := &TestData{5}
 	c := memo.New[*TestData]()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 
 	if err := c.SetWithContext(ctx, "key", testData, time.Second*5); err != nil {
 		t.Fail()
@@ -63,6 +63,7 @@ func TestGetValueWithContext(t *testing.T) {
 		t.Fail()
 	}
 
+	cancel()
 }
 
 func TestGetValueWithContext_Cancel(t *testing.T) {
@@ -86,7 +87,7 @@ func TestMarshal(t *testing.T) {
 	testData := &TestData{5}
 	c := memo.New[*TestData]()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	if err := c.SetWithContext(ctx, "key", testData, time.Second*5); err != nil {
 		t.Fail()
 	}
@@ -94,13 +95,15 @@ func TestMarshal(t *testing.T) {
 	if _, err := c.MarshalJSON(); err != nil {
 		t.Fail()
 	}
+
+	cancel()
 }
 
 func TestMarshalWithContext(t *testing.T) {
 	testData := &TestData{5}
 	c := memo.New[*TestData]()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	if err := c.SetWithContext(ctx, "key", testData, time.Second*5); err != nil {
 		t.Fail()
 	}
@@ -108,6 +111,7 @@ func TestMarshalWithContext(t *testing.T) {
 	if _, err := c.MarshalJSONWithContext(ctx); err != nil {
 		t.Fail()
 	}
+	cancel()
 }
 
 func TestMarshalWithContext_Cancel(t *testing.T) {
@@ -129,7 +133,7 @@ func TestUnmarshal(t *testing.T) {
 	testData := &TestData{5}
 	c := memo.New[*TestData]()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	if err := c.SetWithContext(ctx, "key", testData, time.Second*5); err != nil {
 		t.Fail()
 	}
@@ -140,13 +144,15 @@ func TestUnmarshal(t *testing.T) {
 	if err := uc.UnmarshalJSON(bytes); err != nil {
 		t.Fail()
 	}
+
+	cancel()
 }
 
 func TestUnmarshalWithContext(t *testing.T) {
 	testData := &TestData{5}
 	c := memo.New[*TestData]()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	if err := c.SetWithContext(ctx, "key", testData, time.Second*5); err != nil {
 		t.Fail()
 	}
@@ -157,6 +163,8 @@ func TestUnmarshalWithContext(t *testing.T) {
 	if err := uc.UnmarshalJSONWithContext(ctx, bytes); err != nil {
 		t.Fail()
 	}
+
+	cancel()
 }
 
 func TestUnmarshalWithContext_Cancel(t *testing.T) {

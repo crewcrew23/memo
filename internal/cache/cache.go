@@ -15,10 +15,11 @@ type Item[T any] struct {
 }
 
 type Cache[T any] struct {
-	items  map[string]*Item[T]
-	mu     sync.RWMutex
-	ctx    context.Context
-	cancel context.CancelFunc
+	items     map[string]*Item[T]
+	mu        sync.RWMutex
+	ctx       context.Context
+	cancel    context.CancelFunc
+	onEvicted func(string, T)
 }
 
 func New[T any](ctx context.Context, cancel context.CancelFunc) *Cache[T] {
@@ -27,6 +28,10 @@ func New[T any](ctx context.Context, cancel context.CancelFunc) *Cache[T] {
 		ctx:    ctx,
 		cancel: cancel,
 	}
+}
+
+func (c *Cache[T]) OnEvicted(fn func(key string, value T)) {
+	c.onEvicted = fn
 }
 
 func (c *Cache[T]) Set(key string, value T, ttl time.Duration) error {
@@ -81,6 +86,9 @@ func (c *Cache[T]) Get(key string) (T, error) {
 
 	if time.Now().After(item.TTL) {
 		c.mu.Lock()
+		if c.onEvicted != nil {
+			c.onEvicted(key, item.Value)
+		}
 		delete(c.items, key)
 		c.mu.Unlock()
 
