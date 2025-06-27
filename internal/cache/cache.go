@@ -36,8 +36,16 @@ func New[T any](ctx context.Context, cancel context.CancelFunc) *Cache[T] {
 	}
 }
 
-func (c *Cache[T]) OnEvicted(fn func(key string, value T)) {
+func (c *Cache[T]) OnEvicted(fn func(key string, value T)) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.items == nil {
+		return errors.New("cache is closed")
+	}
+
 	c.onEvicted = fn
+	return nil
 }
 
 func (c *Cache[T]) Set(key string, value T, ttl time.Duration) error {
