@@ -43,7 +43,11 @@ func clean[T any](c *Cache[T]) {
 			if c.onEvicted != nil {
 				c.onEvicted(k.key, k.value.Value)
 			}
+
 			delete(c.items, k.key)
+
+			c.stat.Evictions++
+			c.stat.SizeBytes -= int64(c.sizeof)
 		}
 		c.mu.Unlock()
 
