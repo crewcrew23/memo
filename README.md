@@ -84,7 +84,7 @@ func main() {
 
 ## Close
 - when closing, the internal context will be cancelled and the cleanup goroutine will be stopped
-the internal map will be nil and access to methods:
+the internal map will be nil and access to methods will be denied:
 OnEvicted 
 Set
 SetWithContext
