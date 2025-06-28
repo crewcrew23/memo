@@ -14,7 +14,7 @@ Lightweight thread-safe cache with TTL and metrics.
 
 ## ✅ Install
 ```bash
-go get will be here
+go get github.com/crewcrew23/memo
 ```
 
 ## 🚀 Quick start
